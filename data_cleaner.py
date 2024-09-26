@@ -71,7 +71,7 @@ class DataCleaner:
 
     def clean_missing_prices(self):
         """
-        Cleans a list of Tick objects by replacing missing prices with the price from the nearest neighbor.
+        Cleans a list of Tick objects by replacing missing prices with an interpolation of neighbouring prices.
 
         Returns:
             None
@@ -79,7 +79,10 @@ class DataCleaner:
         # if there is a missing price, steal the price from the neighbour (good enough for this dataset).
         for i in range(len(self.rows)):
             if not self.rows[i].price:
-                self.rows[i].price = self.rows[i-1].price if i > 0 else self.rows[i+1].price
+                if i == 0 or i == len(self.rows):
+                    self.rows[i].price = self.rows[i-1].price if i > 0 else self.rows[i+1].price
+                    continue
+                self.rows[i].price = (self.rows[i-1].price + self.rows[i+1].price) / 2.0
         
 
     
@@ -88,7 +91,7 @@ class DataCleaner:
         Cleans the time-series data by removing anomalies and inconsistencies. 
         """
         self.clean_negative()
-        self.clean_missing_prices()
         self.clean_magnitude()
+        self.clean_missing_prices()
         self.clean_duplicate_timestamps()
 

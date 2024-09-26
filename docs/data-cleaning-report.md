@@ -27,7 +27,7 @@ I assumed that the prices were meant to be positive, as stock prices generally c
 
 #### Solution
 
-I took the order of magnitude of the previous price in the listing if it existed (subsequent price if it did not), and change the order of magnitude of the current price to be that.
+I did a sliding window approach, comparing each element to the median of it's 5 neighbouring elements. If the element was more than 50% smaller than the median, it was considered to be anomolous, and it's order of magnitude was adjusted.
 
 ### 4. Multiple entries at the same time-stamp
 
