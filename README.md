@@ -11,6 +11,7 @@ I've placed sample output files in the `samples` directory. The following comman
 ./main.py 1hr30m -s 20240916_00:00:00.00 -e 20240920_00:00:00.00 four_days_every_1hr30.csv
 ```
 
+# Usage Guide
 
 > General Usage
 

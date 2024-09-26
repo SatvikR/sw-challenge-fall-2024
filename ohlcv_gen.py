@@ -13,11 +13,6 @@ class OHLCVGen:
             writer = csv.writer(f)
             writer.writerow(['timestamp', 'open', 'high', 'low', 'close', 'volume'])
 
-            interval_open = 0
-            interval_max = float('-inf')
-            interval_low = float('inf')
-            interval_volume = 0
-
             interval_start = max(start_date, self.rows[0].timestamp)
             interval_end = interval_start + interval
             end_date = min(end_date, self.rows[-1].timestamp)
