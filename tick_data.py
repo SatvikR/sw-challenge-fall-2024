@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class Tick:
     timestamp: datetime
-    price: float 
+    price: float
     quantity: int
 
     def __str__(self):

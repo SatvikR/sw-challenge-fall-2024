@@ -1,9 +1,12 @@
 from statistics import median
 from typing import List
-
 from tick_data import Tick
 
+
 class DataCleaner:
+    """
+    Contains methods to clean each of the 4 issues with the time-series data. Modifies all data in place.
+    """
 
     def __init__(self, rows: List[Tick]):
         self.rows = rows
@@ -19,8 +22,8 @@ class DataCleaner:
             None
         """
         # in order to ensure accuracy, this function is not really efficient, so it should be parallelized.
-        window_size = 5 # higher number --> better accuracy
-        # if you have lots and lots of anomolous data, window_size should be higher, but 
+        window_size = 5  # higher number --> better accuracy
+        # if you have lots and lots of anomolous data, window_size should be higher, but
         # here we assume that for every 5 elements, there will be no more than 2 anomolous elements.
 
         for i in range(len(self.rows)):
@@ -28,15 +31,17 @@ class DataCleaner:
             # elements by comparing to the median of the elements in the window
             start = max(0, i - window_size // 2)
             end = min(len(self.rows), i + window_size // 2 + 1)
-            # this formulation of start and end ensures that the window is never near empty, 
+            # this formulation of start and end ensures that the window is never near empty,
             # therefore better for accuracy
-            # don't include i in the window, because we want to compare it to the median of 
+            # don't include i in the window, because we want to compare it to the median of
             # surrounding elements, but don't want it to include it in said median.
-            window = self.rows[start:i] + self.rows[i+1:end] 
-            median_price = median([tick.price for tick in window if tick.price != 0])
+            window = self.rows[start:i] + self.rows[i+1:end]
+            median_price = median(
+                [tick.price for tick in window if tick.price != 0])
             if median_price == 0:
                 print(window)
-            if abs(self.rows[i].price / median_price - 1) > 0.5: # considers a 50% difference to be an anomaly
+            # considers a 50% difference to be an anomaly
+            if abs(self.rows[i].price / median_price - 1) > 0.5:
                 if self.rows[i].price < median_price:
                     self.rows[i].price *= 10.0
 
@@ -63,10 +68,13 @@ class DataCleaner:
         while i < len(self.rows):
             if self.rows[i].timestamp == self.rows[i-1].timestamp:
                 # super simple VWAP (since we only have two elements to average)
-                weighted_sum = self.rows[i-1].price * self.rows[i-1].quantity + self.rows[i].price * self.rows[i].quantity
-                weighted_avg = weighted_sum / (self.rows[i-1].quantity + self.rows[i].quantity)
+                weighted_sum = self.rows[i-1].price * self.rows[i -
+                                                                1].quantity + self.rows[i].price * self.rows[i].quantity
+                weighted_avg = weighted_sum / \
+                    (self.rows[i-1].quantity + self.rows[i].quantity)
                 self.rows[i-1].price = weighted_avg
-                self.rows[i-1].quantity = self.rows[i-1].quantity + self.rows[i].quantity
+                self.rows[i-1].quantity = self.rows[i -
+                                                    1].quantity + self.rows[i].quantity
                 del self.rows[i]
             else:
                 i += 1
@@ -92,26 +100,26 @@ class DataCleaner:
 
         for i in range(len(self.rows)):
             if self.rows[i].price == 0:
+                # find the two nearest non-zero values to interpolate between
                 left_index, left_value = find_non_zero_neighbor(i, 'left')
                 right_index, right_value = find_non_zero_neighbor(i, 'right')
                 if left_index is None and right_index is None:
-                    # All prices are zero, can't interpolate
+                    # All prices are zero, can't interpolate.
                     continue
-                elif left_index is None: # no non-zero neighbours on the left
+                elif left_index is None:  # no non-zero neighbours on the left
                     self.rows[i].price = right_value
-                elif right_index is None: # no non-zero neighbours on the right
+                elif right_index is None:  # no non-zero neighbours on the right
                     self.rows[i].price = left_value
                 else:
                     # interpolate
                     self.rows[i].price = (left_value + right_value) / 2.0
 
-    
     def clean(self) -> List[Tick]:
         """
         Cleans the time-series data by removing anomalies and inconsistencies. 
         """
+        # all in-place
         self.clean_negative()
         self.clean_magnitude()
         self.clean_missing_prices()
         self.clean_duplicate_timestamps()
-

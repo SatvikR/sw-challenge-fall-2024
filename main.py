@@ -5,8 +5,8 @@ from data_loader import DataLoader
 from datetime import datetime, timedelta
 import time
 import argparse
-
 from ohlcv_gen import OHLCVGen
+
 
 def parse_time_interval(s: str):
     """
@@ -42,17 +42,24 @@ def parse_time_interval(s: str):
 def parse_date(s: str):
     return datetime.strptime(s, "%Y%m%d_%H:%M:%S.%f")
 
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="An interface to work with CTG tick data.")
-    parser.add_argument("interval", help="the time interval between output OHLCV data.", type=str)
-    parser.add_argument("output_file", help="path to the output file to create.", type=str)
-    parser.add_argument("-s", "--start_date", help="the start date of the data to output. defaults to the minimum datetime in python. Expects YYYYMMDD_HH:MM:SS.MS", type=str)
-    parser.add_argument("-e", "--end_date", help="the end date of the data to output. defaults to the maximum datetime in python. Expects YYYYMMDD_HH:MM:SS.MS", type=str)
+    parser = argparse.ArgumentParser(
+        description="An interface to work with CTG tick data.")
+    parser.add_argument(
+        "interval", help="the time interval between output OHLCV data.", type=str)
+    parser.add_argument(
+        "output_file", help="path to the output file to create.", type=str)
+    parser.add_argument(
+        "-s", "--start_date", help="the start date of the data to output. defaults to the minimum datetime in python. Expects YYYYMMDD_HH:MM:SS.MS", type=str)
+    parser.add_argument(
+        "-e", "--end_date", help="the end date of the data to output. defaults to the maximum datetime in python. Expects YYYYMMDD_HH:MM:SS.MS", type=str)
     args = parser.parse_args()
 
     out_file = args.output_file
     interval = parse_time_interval(args.interval)
-    start_date = parse_date(args.start_date) if args.start_date else datetime.min
+    start_date = parse_date(
+        args.start_date) if args.start_date else datetime.min
     end_date = parse_date(args.end_date) if args.end_date else datetime.max
 
     start_time = time.time()
