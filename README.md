@@ -1,4 +1,16 @@
-# Cardinal SW Challenge -- Usage Guide
+# Cardinal SW Challenge
+
+## File details
+
+Source files are in the root directory of this repo. I've put my data cleaning report in the `docs` directory, and 
+I've placed sample output files in the `samples` directory. The following commands were used to generate those files.
+
+```sh
+./main.py 3h every_three_hrs.csv
+./main.py 1m -s 20240916_00:00:00.00 -e 20240917_00:00:00.00 one_day_every_min.csv
+./main.py 1hr30m -s 20240916_00:00:00.00 -e 20240920_00:00:00.00 four_days_every_1hr30.csv
+```
+
 
 > General Usage
 

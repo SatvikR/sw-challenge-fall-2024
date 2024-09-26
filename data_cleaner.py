@@ -33,7 +33,9 @@ class DataCleaner:
             # don't include i in the window, because we want to compare it to the median of 
             # surrounding elements, but don't want it to include it in said median.
             window = self.rows[start:i] + self.rows[i+1:end] 
-            median_price = median([tick.price for tick in window])
+            median_price = median([tick.price for tick in window if tick.price != 0])
+            if median_price == 0:
+                print(window)
             if abs(self.rows[i].price / median_price - 1) > 0.5: # considers a 50% difference to be an anomaly
                 if self.rows[i].price < median_price:
                     self.rows[i].price *= 10.0
@@ -76,14 +78,32 @@ class DataCleaner:
         Returns:
             None
         """
-        # if there is a missing price, steal the price from the neighbour (good enough for this dataset).
+        def find_non_zero_neighbor(index, direction):
+            """
+            A helper method to find the nearest non-zero price on either side so we can interpolate between them.
+            """
+            step = 1 if direction == 'right' else -1
+            i = index + step
+            while 0 <= i < len(self.rows):
+                if self.rows[i].price != 0:
+                    return i, self.rows[i].price
+                i += step
+            return None, None
+
         for i in range(len(self.rows)):
-            if not self.rows[i].price:
-                if i == 0 or i == len(self.rows):
-                    self.rows[i].price = self.rows[i-1].price if i > 0 else self.rows[i+1].price
+            if self.rows[i].price == 0:
+                left_index, left_value = find_non_zero_neighbor(i, 'left')
+                right_index, right_value = find_non_zero_neighbor(i, 'right')
+                if left_index is None and right_index is None:
+                    # All prices are zero, can't interpolate
                     continue
-                self.rows[i].price = (self.rows[i-1].price + self.rows[i+1].price) / 2.0
-        
+                elif left_index is None: # no non-zero neighbours on the left
+                    self.rows[i].price = right_value
+                elif right_index is None: # no non-zero neighbours on the right
+                    self.rows[i].price = left_value
+                else:
+                    # interpolate
+                    self.rows[i].price = (left_value + right_value) / 2.0
 
     
     def clean(self) -> List[Tick]:
