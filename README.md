@@ -11,6 +11,27 @@ I've placed sample output files in the `samples` directory. The following comman
 ./main.py 1hr30m -s 20240916_00:00:00.00 -e 20240920_00:00:00.00 four_days_every_1hr30.csv
 ```
 
+# Assumptions and Limitations
+
+### Data Loading
+
+- assumes all the file-names in the data directory are formatted correcrtly, and assumes they are valid CSV's.
+- utilizes available cores on the CPU, but does not multithread within each core.
+- I did not implement lazy loading, so this does use quite a bit of memory, but (generally) totally fine for a modern computer.
+
+### Data Cleaning
+
+- assumes that the 4 problems are the only 4 problems that exist.
+- for the sake of memory, I did not use multiprocessing during cleaning, but (in theory) it would not be difficult to do, if I did away with the in-place cleaning (because of separate virtual memory spaces on separate processes, in-place cleaning would not be possible with multi-processing; I could use threads instead, but it's less scalable and sometimes slower).
+
+### OHLCV Generation
+
+- No major assumptions here, beside that the file path is valid
+
+### CLI Interface
+
+- I did not implement a whole lot of input verification (beyond what is provided by `argparse`), but since I have so few arguments, it should not be a huge hastle to do so.
+
 # Usage Guide
 
 > General Usage
