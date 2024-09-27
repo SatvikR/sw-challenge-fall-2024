@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -x
+
 rm -r samples
 mkdir samples
 
